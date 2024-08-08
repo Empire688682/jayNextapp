@@ -2,18 +2,19 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { axios } from 'axios';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [user, setUser] = React.useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = React.useState(false);
 
-  console.log(user)
 
   const submitHandler = (e) => {
     e.preventDefault();
+    loginUser()
   }
 
   const onChangeHandler = (e) => {
@@ -23,6 +24,7 @@ const LoginPage = () => {
 
   const loginUser = async () => {
     try {
+      setLoading(true)
       const response = await axios.post("api/users/login", user);
       if (response.data) {
         setUser({
@@ -34,12 +36,15 @@ const LoginPage = () => {
       console.log(error);
 
     }
+    finally{
+      setLoading(false)
+    }
   }
 
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>{loading? "Processing":"Login"}</h1>
       <form onSubmit={submitHandler}>
         <input onChange={onChangeHandler} type="email" name="email" value={user.email} id="" placeholder='Email' />
         <br />
