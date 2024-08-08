@@ -2,23 +2,38 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {axios} from 'axios';
+import { axios } from 'axios';
 
 const LoginPage = () => {
   const [user, setUser] = React.useState({
-    email:"",
-    password:"",
+    email: "",
+    password: "",
   });
 
   console.log(user)
 
-  const submitHandler = (e) =>{
+  const submitHandler = (e) => {
     e.preventDefault();
   }
 
-  const onChangeHandler = (e) =>{
-    const {name, value} = e.target;
-    setUser((prev)=>({...prev, [name]:value}))
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setUser((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const loginUser = async () => {
+    try {
+      const response = await axios.post("api/users/login", user);
+      if (response.data) {
+        setUser({
+          email: "",
+          password: "",
+        })
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
   }
 
 

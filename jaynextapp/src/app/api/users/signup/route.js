@@ -3,58 +3,70 @@ import { connectDb } from "@/dbConfig/dbConfig.js";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import validator from "validator";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-
+dotenv.config();
 connectDb();
 
-const createToken = (id) =>{
-    return jwt.sign({id}, process.env.TOKEN_KEY);
-}
-
-const registerUser = async (req) =>{
+export const registerUser = async (req) => {
     try {
-        const {username, email, password} = await req.json();
-        const user = await UserModel.findOne({email});
+        const { username, email, password } = await req.json();
+        const user = await UserModel.findOne({ email });
 
-        //checking empty input
-        if(!username || !email || !password){
-            return new NextResponse(JSON.stringify({success:false, message:"All filed required"}), {status:500})
+        // Checking empty input
+        if (!username || !email || !password) {
+            return NextResponse.json({ success: false, message: "All fields required" }, { status: 400 });
         }
 
-        //chaecking isUser exist
-        if(user){
-            return new NextResponse(JSON.stringify({success:false, message:"User already exist"}), {status:500})
-        };
+        // Checking if user exists
+        if (user) {
+            return NextResponse.json({ success: false, message: "User already exists" }, { status: 400 });
+        }
 
-        //checking isEmail valid
-        if(!validator.isEmail(email)){
-            return new NextResponse(JSON.stringify({success:false, message:"Invalid email address"}), {status:500})
-        };
+        // Checking if email is valid
+        if (!validator.isEmail(email)) {
+            return NextResponse.json({ success: false, message: "Invalid email address" }, { status: 400 });
+        }
 
-        //checking password strength
-        if(password.length <= 8){
-            return new NextResponse(JSON.stringify({success:false, message:"Password too short"}), {status:500})
-        };
+        // Checking password strength
+        if (password.length <= 8) {
+            return NextResponse.json({ success: false, message: "Password too short" }, { status: 400 });
+        }
 
-        //passwordHash
+        // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        //create new user
-        const newUser = await new UserModel({
+        // Creating new user
+        const newUser = new UserModel({
             username,
             email,
-            password:hashedPassword,
+            password: hashedPassword,
         });
 
-        const token = createToken(newUser._id)
         await newUser.save();
 
-        return new NextResponse(JSON.stringify({success:true, token, message:"User added successful"}), {status:200})
+        // Generating token
+        const token = jwt.sign({ id: newUser._id }, process.env.TOKEN_KEY, { expiresIn: "2h" });
+
+        // Creating a response with a cookie
+        const res = NextResponse.json({ success: true, token, message: "User added successfully" }, { status: 200 });
+        res.cookies.set('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60, // 1 week
+            path: '/'
+        });
+
+        return res;
 
     } catch (error) {
         console.log(error);
-        return new NextResponse(JSON.stringify({success:false, message:"Internal Server Error"}), {status:500})
+        return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
     }
 }
 
+export async function POST(req) {
+    return registerUser(req);
+}

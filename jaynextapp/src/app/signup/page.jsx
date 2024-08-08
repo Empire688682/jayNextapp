@@ -2,38 +2,60 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {axios} from 'axios';
+import axios from 'axios';
 
 const SignupPage = () => {
   const [user, setUser] = React.useState({
-    username:"",
-    email:"",
-    password:"",
+    username: "",
+    email: "",
+    password: "",
   });
+  const [loading, setLoading] = React.useState(false);
+  const [token, setToken] = React.useState(null)
 
-  console.log(user)
-
-  const submitHandler = (e) =>{
+  const submitHandler = (e) => {
     e.preventDefault();
+    registerUser();
   }
 
-  const onChangeHandler = (e) =>{
-    const {name, value} = e.target;
-    setUser((prev)=>({...prev, [name]:value}))
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setUser((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const registerUser = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.post("api/users/signup", user);
+      if (response.data) {
+        setUser({
+          username: "",
+          email: "",
+          password: "",
+        });
+        setToken(response.data.token);
+      }
+
+    } catch (error) {
+      console.log("Error:", error)
+    }
+    finally {
+      setLoading(false)
+    }
   }
 
 
   return (
     <div>
-      <h1>Signup</h1>
+      <h1>{loading? "Processing":"Signup"}</h1>
       <form onSubmit={submitHandler}>
-        <input onChange={onChangeHandler} type="text" name="username" value={user.username} id="" placeholder='Username' />
+        <input required onChange={onChangeHandler} type="text" name="username" value={user.username} id="" placeholder='Username' />
         <br />
         <br />
-        <input onChange={onChangeHandler} type="email" name="email" value={user.email} id="" placeholder='Email' />
+        <input required onChange={onChangeHandler} type="email" name="email" value={user.email} id="" placeholder='Email' />
         <br />
         <br />
-        <input onChange={onChangeHandler} type="password" name="password" value={user.password} id="" placeholder='Password' />
+        <input required onChange={onChangeHandler} type="password" name="password" value={user.password} id="" placeholder='Password' />
         <br />
         <br />
         <button type="submit">Signup</button>
