@@ -2,9 +2,13 @@
 import React from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const page = () => {
   const router = useRouter();
+  const [userId, setUserId] = React.useState("nothing");
+  console.log(userId)
+
 
   const logoutUser = async () =>{
     try {
@@ -19,6 +23,7 @@ const page = () => {
     try {
      const response = await axios.get("api/users/user");
      console.log(response.data)
+     setUserId(response.data.user._id)
     } catch (error) {
       console.log(error)
     }
@@ -29,7 +34,8 @@ const page = () => {
       <button onClick={logoutUser}>Logout</button>
       <br />
       <br />
-      <button onClick={getUserData}>GetUserData</button>
+      <button onClick={getUserData}>GetUserData</button> <br /><br />
+      <button>{userId === "nothing"? "No Id":<Link href={`/profile/${userId}`}>{userId}</Link>}</button>
     </div>
   )
 }
