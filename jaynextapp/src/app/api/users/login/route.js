@@ -10,7 +10,7 @@ dotenv.config();
 connectDb()
 
 const loginUser = async (req) =>{
-    const {email, password} = await req.json();
+    const {email, password, username} = await req.json();
     try {
         if(!email || !password){
             return new NextResponse(JSON.stringify({success:false, message:"fill the empty input"}), {status:500})
@@ -25,7 +25,15 @@ const loginUser = async (req) =>{
             return new NextResponse(JSON.stringify({success:false, message:"Incorrect password"}), {status:400})
         }
 
-        const token = jwt.sign({id : user._id}, process.env.TOKEN_KEY)
+        //create tokendata
+        const tokenData = {
+            id: user._id,
+            username: user,username,
+            email: user.email
+        }
+
+        //create token
+        const token = jwt.sign(tokenData, process.env.TOKEN_KEY)
         const res = NextResponse.json({success:true, token, message:"Login successful"});
         res.cookies.set("token", token, {
             httpOnly:true,
