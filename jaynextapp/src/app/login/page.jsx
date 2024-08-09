@@ -10,6 +10,7 @@ const LoginPage = () => {
     password: "",
   });
   const [loading, setLoading] = React.useState(false);
+  const router = useRouter()
 
 
   const submitHandler = (e) => {
@@ -25,12 +26,13 @@ const LoginPage = () => {
   const loginUser = async () => {
     try {
       setLoading(true)
-      const response = await axios.post("api/users/login", user);
+      const response = await axios.post("/api/users/login", user);
       if (response.data) {
         setUser({
           email: "",
           password: "",
-        })
+        });
+        router.push("/profile")
       }
     } catch (error) {
       console.log(error);
