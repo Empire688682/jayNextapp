@@ -23,7 +23,7 @@ const page = () => {
     try {
      const response = await axios.get("api/users/user");
      console.log(response.data)
-     setUserId(response.data.user._id)
+     setUserId(response.data.data._id)
     } catch (error) {
       console.log(error)
     }
@@ -34,7 +34,7 @@ const page = () => {
       <button onClick={logoutUser}>Logout</button>
       <br />
       <br />
-      <button onClick={getUserData}>GetUserData</button> <br /><br />
+      <button onClick={getUserData}>GetUser Details</button> <br /><br />
       <button>{userId === "nothing"? "No Id":<Link href={`/profile/${userId}`}>{userId}</Link>}</button>
     </div>
   )
