@@ -1,6 +1,6 @@
 import { connectDb } from "@/dbConfig/dbConfig";
 import { getUserToken } from "@/helpers/getUserToken";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse} from "next/server";
 import { UserModel } from "@/models/userModel";
 
 connectDb();

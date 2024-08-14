@@ -1,6 +1,6 @@
 import { UserModel } from "@/models/userModel.js";
 import { connectDb } from "@/dbConfig/dbConfig.js";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import validator from "validator";
 import jwt from 'jsonwebtoken';
@@ -51,13 +51,7 @@ export const registerUser = async (req) => {
 
         // Creating a response with a cookie
         const res = NextResponse.json({ success: true, token, message: "User added successfully" }, { status: 200 });
-        res.cookies.set('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60, // 1 week
-            path: '/'
-        });
+        
 
         return res;
 

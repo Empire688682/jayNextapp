@@ -7,11 +7,15 @@ const myMiddleware = async (req) => {
 
         const token = req.cookies.get("token")?.value || "";
         const isPublicPath = path === "/login" || path === "/signup";
+        const isHome = path === "/"
 
         if (isPublicPath && token) {
             return NextResponse.redirect(new URL("/profile", req.url));
         }
         if (!token && !isPublicPath) {
+            return NextResponse.redirect(new URL("/login", req.url));
+        }
+        if(isHome && !token){
             return NextResponse.redirect(new URL("/login", req.url));
         }
     } catch (error) {

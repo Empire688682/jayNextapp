@@ -11,7 +11,6 @@ const SignupPage = () => {
     password: "",
   });
   const [loading, setLoading] = React.useState(false);
-  const [token, setToken] = React.useState(null);
   const router = useRouter()
 
   const submitHandler = (e) => {
@@ -34,7 +33,6 @@ const SignupPage = () => {
           email: "",
           password: "",
         });
-        setToken(response.data.token);
         router.push("/login")
       }
 
