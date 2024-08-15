@@ -8,9 +8,9 @@ import dotenv from 'dotenv';
 import sendEmail from "@/helpers/mailer";
 
 dotenv.config();
-connectDb();
 
 export const registerUser = async (req) => {
+    connectDb();
     try {
         const { username, email, password } = await req.json();
         const user = await UserModel.findOne({ email });
